@@ -129,21 +129,21 @@
         </button>
 
         <button
-            v-if="orderDetail.order?.status === 'PENDING' || orderDetail.order?.status === '待支付'"
+            v-if="['PENDING', '待支付'].includes(orderDetail.order?.status || '')"
             class="btn btn-primary"
             @click="goToPay"
         >去支付
         </button>
 
         <button
-            v-if="orderDetail.order?.status === 'DELIVERING' || orderDetail.order?.status === '配送中'"
+            v-if="['DELIVERING', '配送中'].includes(orderDetail.order?.status || '')"
             class="btn btn-primary"
             @click="confirmOrder"
         >确认收货
         </button>
 
         <button
-            v-if="orderDetail.order?.status === 'COMPLETED' || orderDetail.order?.status === '已完成'"
+            v-if="['COMPLETED', '已完成'].includes(orderDetail.order?.status || '')"
             class="btn btn-primary"
             @click="reviewOrder"
         >评价订单
@@ -499,7 +499,7 @@ function cancelOrder() {
         isLoading.value = true;
         orderCancelOrder({ id: orderId.value || '' })
           .then(res => {
-            if (res.data && res.data.code === 200) {
+            if (res.data && res.data.code === 20000) {
               uni.showToast({
                 title: '订单已取消',
                 icon: 'success'

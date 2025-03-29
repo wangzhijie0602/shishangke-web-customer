@@ -30,6 +30,14 @@
 			}
 		},
 		{
+			"path": "pages/payment/index",
+			"style": {
+				"navigationBarTitleText": "订单支付",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
 			"path": "pages/person/index",
 			"style": {
 				"navigationBarTitleText": "我的",

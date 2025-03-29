@@ -222,7 +222,7 @@ onLoad(async () => {
       
       if (!userInfoStore.userInfo.id) {
         console.error('获取用户信息失败: 无法获取用户ID');
-        uni.showToast({
+        await uni.showToast({
           title: '请先登录',
           icon: 'none'
         });
@@ -237,7 +237,7 @@ onLoad(async () => {
       }
     } catch (error) {
       console.error('获取用户信息失败:', error);
-      uni.showToast({
+      await uni.showToast({
         title: '获取用户信息失败，请重新登录',
         icon: 'none'
       });

@@ -509,6 +509,27 @@ declare namespace API {
     newPassword: string;
   };
 
+  type paymentConfirmPaymentParams = {
+    paymentId: string;
+  };
+
+  type PaymentCreateRequest = {
+    orderId?: string;
+    paymentMethod?: "微信支付" | "支付宝" | "信用卡" | "现金";
+  };
+
+  type PaymentVO = {
+    id?: string;
+    orderId?: string;
+    customerId?: string;
+    paymentAmount?: number;
+    paymentMethod?: "微信支付" | "支付宝" | "信用卡" | "现金";
+    status?: "待支付" | "支付成功" | "支付失败" | "已退款";
+    paymentTime?: string;
+    createdAt?: string;
+    updatedAt?: string;
+  };
+
   type QueryRequest = {
     username?: string;
     phone?: string;
@@ -597,6 +618,12 @@ declare namespace API {
     code?: number;
     msg?: string;
     data?: PageUserVO;
+  };
+
+  type ResultPaymentVO = {
+    code?: number;
+    msg?: string;
+    data?: PaymentVO;
   };
 
   type ResultSaTokenInfo = {

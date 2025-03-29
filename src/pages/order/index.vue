@@ -21,42 +21,42 @@
           v-for="(orderItem, index) in orderList" 
           :key="index" 
           class="order-item"
-          @click="goToOrderDetail(orderItem.order.id)"
+          @click="goToOrderDetail(orderItem?.order?.id)"
         >
           <!-- 店铺信息 -->
           <view class="merchant-info">
-            <text class="merchant-name">{{ orderItem.order.merchantName }}</text>
-            <view :class="['order-status', getStatusClass(orderItem.order.status)]">{{ getStatusText(orderItem.order.status) }}</view>
+            <text class="merchant-name">{{ orderItem?.order?.merchantName }}</text>
+            <view :class="['order-status', getStatusClass(orderItem?.order?.status)]">{{ getStatusText(orderItem?.order?.status) }}</view>
           </view>
           
           <!-- 商品列表 -->
           <view class="goods-list">
             <view class="goods-images">
               <image 
-                v-for="(item, itemIndex) in orderItem.orderItem.slice(0, 3)" 
+                v-for="(item, itemIndex) in orderItem?.orderItem?.slice(0, 3) || []" 
                 :key="itemIndex"
                 :src="item.imageUrl" 
                 class="goods-image"
                 mode="aspectFill"
               />
-              <view v-if="orderItem.orderItem.length > 3" class="goods-count">
-                +{{ orderItem.orderItem.length - 3 }}
+              <view v-if="orderItem?.orderItem?.length && orderItem?.orderItem?.length > 3" class="goods-count">
+                +{{ (orderItem?.orderItem?.length || 0) - 3 }}
               </view>
             </view>
             <view class="order-info">
-              <text class="goods-count-text">共{{ orderItem.orderItem.length }}件商品</text>
-              <text class="order-amount">￥{{ orderItem.order.actualAmount }}</text>
+              <text class="goods-count-text">共{{ orderItem?.orderItem?.length || 0 }}件商品</text>
+              <text class="order-amount">￥{{ orderItem?.order?.actualAmount || 0 }}</text>
             </view>
           </view>
           
           <!-- 订单底部 -->
           <view class="order-footer">
-            <text class="order-time">{{ formatDate(orderItem.order.createdAt) }}</text>
+            <text class="order-time">{{ formatDate(orderItem?.order?.createdAt) }}</text>
             <view class="order-btns">
-              <button v-if="orderItem.order.status === 'PENDING' || orderItem.order.status === '待支付'" class="btn btn-pay" @click.stop="goToPay(orderItem.order.id)">去支付</button>
-              <button v-if="['PENDING', 'PAID', 'PREPARING', '待支付', '已支付', '准备中'].includes(orderItem.order.status)" class="btn btn-cancel" @click.stop="cancelOrder(orderItem.order.id)">取消订单</button>
-              <button v-if="orderItem.order.status === 'DELIVERING' || orderItem.order.status === '配送中'" class="btn btn-confirm" @click.stop="confirmOrder(orderItem.order.id)">确认收货</button>
-              <button v-if="orderItem.order.status === 'COMPLETED' || orderItem.order.status === '已完成'" class="btn btn-review" @click.stop="reviewOrder(orderItem.order.id)">评价</button>
+              <button v-if="['PENDING', '待支付'].includes(orderItem?.order?.status || '')" class="btn btn-pay" @click.stop="goToPay(orderItem?.order?.id)">去支付</button>
+              <button v-if="['PENDING', 'PAID', 'PREPARING', '待支付', '已支付', '准备中'].includes(orderItem?.order?.status || '')" class="btn btn-cancel" @click.stop="cancelOrder(orderItem?.order?.id)">取消订单</button>
+              <button v-if="['DELIVERING', '配送中'].includes(orderItem?.order?.status || '')" class="btn btn-confirm" @click.stop="confirmOrder(orderItem?.order?.id)">确认收货</button>
+              <button v-if="['COMPLETED', '已完成'].includes(orderItem?.order?.status || '')" class="btn btn-review" @click.stop="reviewOrder(orderItem?.order?.id)">评价</button>
             </view>
           </view>
         </view>
@@ -147,8 +147,10 @@ function goToOrderDetail(orderId?: string) {
 
 // 去支付
 function goToPay(orderId?: string) {
-  // TODO: 实现支付逻辑
-  console.log('去支付', orderId);
+  if (!orderId) return;
+  uni.navigateTo({
+    url: `/pages/payment/index?orderId=${orderId}`
+  });
 }
 
 // 取消订单
@@ -209,7 +211,8 @@ function reviewOrder(orderId?: string) {
 
 // 获取订单列表
 async function fetchOrders() {
-  if (isLoading.value || !hasMore.value) return;
+  // 只在加载更多时检查这些条件，重置列表时不检查
+  if (orderList.value.length > 0 && (isLoading.value || !hasMore.value)) return;
   
   isLoading.value = true;
   try {
@@ -219,7 +222,7 @@ async function fetchOrders() {
     );
     
     if (res.data.data && res.data.data.records) {
-      if (pageNum.value === 20000) {
+      if (pageNum.value === 1) {
         orderList.value = res.data.data.records;
       } else {
         orderList.value = [...orderList.value, ...res.data.data.records];
